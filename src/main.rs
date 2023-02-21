@@ -1,7 +1,10 @@
-use libtetris::game::Game;
+use libtetris::Game;
 
 
 
 fn main() {
-    let game = Game::create();
+    let mut game = Game::create();
+    for _ in 0..100 {
+        game.tick();
+    }
 }

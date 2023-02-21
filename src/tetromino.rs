@@ -2,10 +2,11 @@ use crate::shape::Shape;
 
 
 
+#[derive(Debug)]
 pub struct Tetromino {
     shape: Shape,
-    pos_x: i32,
-    pos_y: i32,
+    pub pos_x: i32,
+    pub pos_y: i32,
     rotation: i32,
 }
 
@@ -28,5 +29,14 @@ impl Tetromino {
 
     pub fn move_down(&mut self) {
         self.pos_y += 1;   
+    }
+
+    pub fn create() -> Tetromino {
+        Tetromino {
+            shape: Shape::O,
+            pos_x: 4,
+            pos_y: 0,
+            rotation: 0
+        }
     }
 }
