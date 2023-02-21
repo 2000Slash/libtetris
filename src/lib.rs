@@ -22,6 +22,10 @@ impl Game {
         }
     }
 
+    pub fn draw(&self) -> Vec<i32> {
+        self.board.draw()
+    }
+
     pub fn restart(&mut self) {
         self.score = 0;
         self.lost = false;

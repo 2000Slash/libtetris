@@ -30,68 +30,26 @@ impl Default for Board {
     }
 }
 
-impl Display for Board {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut s = String::new();
-        for row in &self.cells {
-            for cell in row {
-                if *cell == 0 {
-                    s.push(' ');
-                } else {
-                    s.push('█');
-                }
-            }
-            s.push('\n');
-        }
-        if let Some(tetromino) = &self.current_tetromino {
-            let collision = tetromino.get_collision();
-            for (y, row) in collision.iter().enumerate() {
-                for (x, cell) in row.iter().enumerate() {
-                    if *cell == 1 {
-                        let range = (tetromino.pos_y as usize + y) * (self.width as usize + 1) + tetromino.pos_x as usize + x;
-                        s.replace_range( 
-                            s
-                                .char_indices()
-                                .nth(range)
-                                .map(|(pos, ch)| (pos..pos + ch.len_utf8()))
-                                .unwrap(),
-                            "X"
-                        );
-                    }
-                }
-            }
-        }
-        write!(f, "{}", s)?;
-        Ok(())
-    }
-}
-
-impl Debug for Board {
-    //print the full board with 0 and 1
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut s = String::new();
-        for row in &self.cells {
-            for cell in row {
-                s.push_str(&format!("{}", cell));
-            }
-            s.push('\n');
-        }
-        if let Some(tetromino) = &self.current_tetromino {
-            let collision = tetromino.get_collision();
-            for (y, row) in collision.iter().enumerate() {
-                for (x, cell) in row.iter().enumerate() {
-                    if *cell == 1 {
-                        s.replace_range((tetromino.pos_y as usize + y) * (self.width as usize + 1) + tetromino.pos_x as usize + x..(tetromino.pos_y as usize + y) * (self.width as usize + 1) + tetromino.pos_x as usize + x + 1, "X");
-                    }
-                }
-            }
-        }
-        write!(f, "{}", s)?;
-        Ok(())
-    }
-}
-
 impl Board {
+    pub fn draw(&self) -> Vec<i32> {
+        let mut result = Vec::new();
+        for row in &self.cells {
+            for cell in row {
+                result.push(*cell);
+            }
+        }
+        if let Some(tetromino) = &self.current_tetromino {
+            let collision = tetromino.get_collision();
+            for (y, row) in collision.iter().enumerate() {
+                for (x, cell) in row.iter().enumerate() {
+                    if *cell == 1 {
+                        result[(tetromino.pos_y as usize + y) * self.width as usize + tetromino.pos_x as usize + x] = tetromino.get_color();
+                    }
+                }
+            }
+        }
+        result
+    }
 
     pub fn reset(&mut self) {
         self.cells = vec![vec![0; self.width as usize]; self.height as usize];
@@ -102,7 +60,6 @@ impl Board {
     }
 
     pub fn tick(&mut self) {
-        println!("{}", self);
         if self.paused {
             return;
         }
