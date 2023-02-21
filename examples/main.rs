@@ -8,6 +8,6 @@ fn main() {
     let mut game = Game::create();
     while !game.lost {
         game.tick();
-        thread::sleep(std::time::Duration::from_millis(10));
+        thread::sleep(std::time::Duration::from_millis(50));
     }
 }

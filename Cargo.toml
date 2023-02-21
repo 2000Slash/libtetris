@@ -2,7 +2,11 @@
 name = "libtetris"
 version = "0.0.1"
 edition = "2021"
-
+license = "MIT"
+description = "A basic tetris implementation"
+repository = "https://github.com/2000Slash/libtetris"
+readme = "Readme.md"
+keywords = ["tetris"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
