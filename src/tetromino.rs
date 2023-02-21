@@ -1,3 +1,5 @@
+use rand::{rngs::ThreadRng, Rng};
+
 use crate::shape::Shape;
 
 
@@ -31,9 +33,21 @@ impl Tetromino {
         self.pos_y += 1;   
     }
 
-    pub fn create() -> Tetromino {
+    pub fn get_color(&self) -> i32 {
+        match self.shape {
+            Shape::I => 1,
+            Shape::J => 2,
+            Shape::L => 3,
+            Shape::O => 4,
+            Shape::S => 5,
+            Shape::T => 6,
+            Shape::Z => 7,
+        }
+    }
+
+    pub fn create(random: &mut ThreadRng) -> Tetromino {
         Tetromino {
-            shape: Shape::O,
+            shape: random.gen(),
             pos_x: 4,
             pos_y: 0,
             rotation: 0

@@ -1,10 +1,13 @@
+use std::thread;
+
 use libtetris::Game;
 
 
 
 fn main() {
     let mut game = Game::create();
-    for _ in 0..100 {
+    while !game.lost {
         game.tick();
+        thread::sleep(std::time::Duration::from_millis(10));
     }
 }

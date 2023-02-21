@@ -1,3 +1,5 @@
+use rand::{prelude::Distribution, distributions::Standard};
+
 #[derive(Debug, Clone, Copy)]
 pub enum Shape {
     I,
@@ -118,6 +120,21 @@ impl Shape {
             Shape::Z => vec![vec![0, 1, 0],
                              vec![1, 1, 0],
                              vec![1, 0, 0]],
+        }
+    }
+}
+
+impl Distribution<Shape> for Standard {
+    fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Shape {
+        match rng.gen_range(0..=6) {
+            0 => Shape::I,
+            1 => Shape::J,
+            2 => Shape::L,
+            3 => Shape::O,
+            4 => Shape::S,
+            5 => Shape::T,
+            6 => Shape::Z,
+            _ => Shape::I
         }
     }
 }
