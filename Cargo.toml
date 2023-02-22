@@ -1,6 +1,6 @@
 [package]
 name = "libtetris"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2021"
 license = "MIT"
 description = "A basic tetris implementation"
@@ -10,11 +10,15 @@ keywords = ["tetris"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-crate-type = ["cdylib"]
+name = "tetris"
+crate-type = ["cdylib", "lib"]
 
 [dev-dependencies]
 rand = "0.8.5"
 
 [dependencies]
-wasm-bindgen = "0.2.84"
-console_error_panic_hook = "0.1.7"
+wasm-bindgen = { version = "0.2.84", optional = true}
+console_error_panic_hook = { version = "0.1.7", optional = true}
+
+[features]
+wasm = ["dep:wasm-bindgen", "dep:console_error_panic_hook"]
