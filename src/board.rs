@@ -6,6 +6,8 @@ pub struct Board {
     cells: Vec<Vec<i32>>,
     current_tetromino: Option<Tetromino>,
     placement_timer: i32,
+    drop_timer: i32,
+    drop_time: i32,
     random: Box<dyn Randomizer>,
     pub paused: bool,
     pub lost: bool
@@ -19,6 +21,8 @@ impl Board {
             cells: vec![vec![0; width as usize]; height as usize],
             current_tetromino: None,
             placement_timer: 0,
+            drop_timer: 0,
+            drop_time: 50,
             random: random,
             paused: false,
             lost: false
@@ -57,10 +61,19 @@ impl Board {
         if self.paused {
             return;
         }
+        if self.drop_timer >= self.drop_time {
+            self.drop_timer = 0;
+            self.drop();
+        } else {
+            self.drop_timer += 1;
+        }
+    }
+
+    fn drop(&mut self) {
         if self.current_tetromino.is_some() {
             if self.check_collision() {
                 self.placement_timer += 1;
-                if self.placement_timer >= 1 {
+                if self.placement_timer >= 3 {
                     self.placement_timer = 0;
                     self.place();
                 }
@@ -108,5 +121,128 @@ impl Board {
             }
         }
         false
+    }
+
+    pub fn left(&mut self) {
+        if self.paused {
+            return;
+        }
+        if let Some(tetromino) = &mut self.current_tetromino {
+            let collision = tetromino.get_collision();
+            for (y, row) in collision.iter().enumerate() {
+                for (x, cell) in row.iter().enumerate() {
+                    if *cell == 1 {
+                        if tetromino.pos_x as usize + x == 0 {
+                            return;
+                        }
+                        if self.cells[tetromino.pos_y as usize + y][tetromino.pos_x as usize + x - 1] > 0 {
+                            return;
+                        }
+                    }
+                }
+            }
+            tetromino.move_left();
+        }
+    }
+
+    pub fn right(&mut self) {
+        if self.paused {
+            return;
+        }
+        if let Some(tetromino) = &mut self.current_tetromino {
+            let collision = tetromino.get_collision();
+            for (y, row) in collision.iter().enumerate() {
+                for (x, cell) in row.iter().enumerate() {
+                    if *cell == 1 {
+                        if tetromino.pos_x as usize + x + 1 >= self.width as usize {
+                            return;
+                        }
+                        if self.cells[tetromino.pos_y as usize + y][tetromino.pos_x as usize + x + 1] > 0 {
+                            return;
+                        }
+                    }
+                }
+            }
+            tetromino.move_right();
+        }
+    }
+
+    pub fn down(&mut self) {
+        if self.paused {
+            return;
+        }
+        if let Some(tetromino) = &mut self.current_tetromino {
+            let collision = tetromino.get_collision();
+            for (y, row) in collision.iter().enumerate() {
+                for (x, cell) in row.iter().enumerate() {
+                    if *cell == 1 {
+                        if tetromino.pos_y as usize + y + 1 >= self.height as usize {
+                            self.placement_timer = 10;
+                            return;
+                        }
+                        if self.cells[tetromino.pos_y as usize + y + 1][tetromino.pos_x as usize + x] > 0 {
+                            return;
+                        }
+                    }
+                }
+            }
+            tetromino.move_down();
+        }
+    }
+
+    pub fn rotate_right(&mut self) {
+        if self.paused {
+            return;
+        }
+        if let Some(tetromino) = &mut self.current_tetromino {
+            tetromino.rotate(1);
+            let collision = tetromino.get_collision();
+            for (y, row) in collision.iter().enumerate() {
+                for (x, cell) in row.iter().enumerate() {
+                    if *cell == 1 {
+                        if tetromino.pos_x as usize + x >= self.width as usize {
+                            tetromino.move_left();
+                            return;
+                        }
+                        if tetromino.pos_y as usize + y >= self.height as usize {
+                            tetromino.move_up();
+                            return;
+                        }
+                        if self.cells[tetromino.pos_y as usize + y][tetromino.pos_x as usize + x] > 0 {
+                            tetromino.rotate(-1);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn rotate_left(&mut self) {
+        if self.paused {
+            return;
+        }
+        if let Some(tetromino) = &mut self.current_tetromino {
+            tetromino.rotate(-1);
+            let collision = tetromino.get_collision();
+            for (y, row) in collision.iter().enumerate() {
+                for (x, cell) in row.iter().enumerate() {
+                    if *cell == 1 {
+                        if tetromino.pos_x as usize + x >= self.width as usize {
+                            tetromino.move_left();
+                            return;
+                        }
+                        if tetromino.pos_y as usize + y >= self.height as usize {
+                            tetromino.move_up();
+                            return;
+                        }
+                        if self.cells[tetromino.pos_y as usize + y][tetromino.pos_x as usize + x] > 0 {
+                            tetromino.rotate(1);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

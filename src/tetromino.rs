@@ -23,12 +23,16 @@ impl Tetromino {
         self.pos_x += 1;
     }
 
-    pub fn rotate(&mut self) {
-        self.rotation = (self.rotation + 1) % 4;
+    pub fn rotate(&mut self, direction: i32) {
+        self.rotation = (self.rotation + direction) % 4;
     }
 
     pub fn move_down(&mut self) {
         self.pos_y += 1;   
+    }
+
+    pub fn move_up(&mut self) {
+        self.pos_y -= 1;
     }
 
     pub fn get_color(&self) -> i32 {

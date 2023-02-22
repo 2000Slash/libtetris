@@ -40,4 +40,24 @@ impl Game {
             self.lost = true;
         }
     }
+
+    pub fn left(&mut self) {
+        self.board.left();
+    }
+
+    pub fn right(&mut self) {
+        self.board.right();
+    }
+
+    pub fn down(&mut self) {
+        self.board.down();
+    }
+
+    pub fn rotate_right(&mut self) {
+        self.board.rotate_right();
+    }
+
+    pub fn rotate_left(&mut self) {
+        self.board.rotate_left();
+    }
 }
