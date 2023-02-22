@@ -1,5 +1,3 @@
-use rand::{prelude::Distribution, distributions::Standard};
-
 #[derive(Debug, Clone, Copy)]
 pub enum Shape {
     I,
@@ -124,9 +122,9 @@ impl Shape {
     }
 }
 
-impl Distribution<Shape> for Standard {
-    fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Shape {
-        match rng.gen_range(0..=6) {
+impl From <usize> for Shape {
+    fn from(i: usize) -> Self {
+        match i {
             0 => Shape::I,
             1 => Shape::J,
             2 => Shape::L,

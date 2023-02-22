@@ -1,6 +1,4 @@
-use rand::{rngs::ThreadRng, Rng};
-
-use crate::shape::Shape;
+use crate::{shape::Shape, Randomizer};
 
 
 
@@ -45,9 +43,9 @@ impl Tetromino {
         }
     }
 
-    pub fn create(random: &mut ThreadRng) -> Tetromino {
+    pub fn create(random: &mut Box<dyn Randomizer>) -> Tetromino {
         Tetromino {
-            shape: random.gen(),
+            shape: (random.next() % 7).into(),
             pos_x: 4,
             pos_y: 0,
             rotation: 0

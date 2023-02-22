@@ -1,8 +1,4 @@
-use std::fmt::{Debug, Display};
-
-use rand::rngs::ThreadRng;
-
-use crate::tetromino::Tetromino;
+use crate::{tetromino::Tetromino, Randomizer};
 
 pub struct Board {
     width: i32,
@@ -10,27 +6,25 @@ pub struct Board {
     cells: Vec<Vec<i32>>,
     current_tetromino: Option<Tetromino>,
     placement_timer: i32,
-    random: ThreadRng,
+    random: Box<dyn Randomizer>,
     pub paused: bool,
     pub lost: bool
 }
 
-impl Default for Board {
-    fn default() -> Board {
+impl Board {
+    pub fn new(random: Box<dyn Randomizer>, width: i32, height: i32) -> Board {
         Board {
-            width: 10,
-            height: 20,
-            cells: vec![vec![0; 10]; 20],
+            width: width,
+            height: height,
+            cells: vec![vec![0; width as usize]; height as usize],
             current_tetromino: None,
             placement_timer: 0,
-            random: rand::thread_rng(),
+            random: random,
             paused: false,
             lost: false
         }
     }
-}
 
-impl Board {
     pub fn draw(&self) -> Vec<i32> {
         let mut result = Vec::new();
         for row in &self.cells {
