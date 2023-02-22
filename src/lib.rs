@@ -2,69 +2,48 @@ pub mod tetromino;
 pub mod board;
 pub mod shape;
 
+use std::{panic};
+
+use wasm_bindgen::prelude::wasm_bindgen;
+
 use crate::board::Board;
 
 pub trait Randomizer {
     fn next(&mut self) -> usize;
 }
 
-//Simple "randomizer" that always returns 0
+#[wasm_bindgen(module = "/src/random.js")]
+extern "C" {
+    #[wasm_bindgen]
+    pub fn get_random() -> i32;
+}
+
+//Simple "randomizer" that uses the JS Math.random() function
 struct StaticRand;
 
 impl Randomizer for StaticRand {
     fn next(&mut self) -> usize {
-        0
+        get_random() as usize
     }
 }
 
-pub struct GameBuilder {
-    width: i32,
-    height: i32,
-    random: Box<dyn Randomizer>
-}
-
-
-impl GameBuilder {
-    pub fn new() -> GameBuilder {
-        GameBuilder {
-            width: 10,
-            height: 20,
-            random: Box::from(StaticRand)
-        }
-    }
-
-    pub fn width(mut self, width: i32) -> GameBuilder {
-        self.width = width;
-        self
-    }
-
-    pub fn height(mut self, height: i32) -> GameBuilder {
-        self.height = height;
-        self
-    }
-
-    pub fn random(mut self, random: Box<dyn Randomizer>) -> GameBuilder {
-        self.random = random;
-        self
-    }
-
-    pub fn build(self) -> Game {
-        let board = Board::new(self.random, self.width, self.height);
-        Game {
-            board,
-            score: 0,
-            lost: false
-        }
-    }
-}
-
+#[wasm_bindgen]
 pub struct Game {
     board: Board,
     pub score: i32,
     pub lost: bool
 }
 
+#[wasm_bindgen]
 impl Game {
+    pub fn new() -> Game {
+        Game {
+            board: Board::new(Box::new(StaticRand), 10, 20),
+            score: 0,
+            lost: false
+        }
+    }
+
     pub fn draw(&self) -> Vec<i32> {
         self.board.draw()
     }
