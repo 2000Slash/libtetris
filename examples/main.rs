@@ -1,6 +1,6 @@
 use std::thread;
 
-use libtetris::{Game, GameBuilder, Randomizer};
+use tetris::{game::{Game}, Randomizer};
 use rand::RngCore;
 
 
@@ -25,10 +25,10 @@ impl Randomizer for Rand {
 }
 
 fn main() {
-    let mut game = GameBuilder::new().random(Box::new(Rand)).build();
+    let mut game = Game::new();
     while !game.lost {
         game.tick();
-        thread::sleep(std::time::Duration::from_millis(50));
+        thread::sleep(std::time::Duration::from_millis(10));
         draw_cells(game.draw());
     }
 }

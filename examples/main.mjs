@@ -1,7 +1,5 @@
 import init, {WasmGame} from "./tetris.js"
 
-console.log("toll")
-
 init().then(() => {
     let ctx = document.getElementById("canvas").getContext("2d");
     ctx.canvas.width = 250;
