@@ -127,7 +127,20 @@ impl Board {
         self.current_tetromino = None;
     }
 
+    pub fn hard_drop(&mut self) {
+        if self.paused {
+            return;
+        }
+        while !self.check_collision() {
+            self.current_tetromino.as_mut().unwrap().move_down();
+        }
+        self.place();
+    }
+
     pub fn store(&mut self) {
+        if self.paused {
+            return;
+        }
         if self.current_tetromino.is_some() {
             if self.stored_tetromino.is_some() {
                 let mut temp = self.stored_tetromino.take().unwrap();

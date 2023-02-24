@@ -50,6 +50,10 @@ impl WasmGame {
         }
     }
 
+    pub fn hard_drop(&mut self) {
+        self.board.hard_drop();
+    }
+
     pub fn store(&mut self) {
         self.board.store();
     }
