@@ -5,6 +5,7 @@ pub struct Board {
     height: i32,
     cells: Vec<Vec<i32>>,
     current_tetromino: Option<Tetromino>,
+    stored_tetromino: Option<Tetromino>,
     placement_timer: i32,
     drop_timer: i32,
     drop_time: i32,
@@ -20,6 +21,7 @@ impl Board {
             height: height,
             cells: vec![vec![0; width as usize]; height as usize],
             current_tetromino: None,
+            stored_tetromino: None,
             placement_timer: 0,
             drop_timer: 0,
             drop_time: 50,
@@ -123,6 +125,22 @@ impl Board {
             }
         }
         self.current_tetromino = None;
+    }
+
+    pub fn store(&mut self) {
+        if self.current_tetromino.is_some() {
+            if self.stored_tetromino.is_some() {
+                let mut temp = self.stored_tetromino.take().unwrap();
+                temp.pos_x = 4;
+                temp.pos_y = 0;
+                self.stored_tetromino = Some(self.current_tetromino.take().unwrap());
+                self.current_tetromino = Some(temp);
+            } else {
+                self.stored_tetromino = Some(self.current_tetromino.take().unwrap());
+            }
+        } else if self.stored_tetromino.is_some() {
+            self.current_tetromino = Some(self.stored_tetromino.take().unwrap());
+        }
     }
 
     fn check_collision(&self) -> bool {

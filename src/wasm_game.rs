@@ -50,6 +50,10 @@ impl WasmGame {
         }
     }
 
+    pub fn store(&mut self) {
+        self.board.store();
+    }
+
     pub fn left(&mut self) {
         self.board.left();
     }
