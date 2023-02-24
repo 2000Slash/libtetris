@@ -1,3 +1,3 @@
 export function get_random() {
-    return Math.round(Math.random()*100);
+    return Math.round(Math.random()*7);
 }

@@ -56,11 +56,32 @@ impl Board {
         self.paused = false;
         self.lost = false;
     }
+    
+    pub fn check_tetris(&mut self) {
+        let mut rows_to_remove = Vec::new();
+        for (y, row) in self.cells.iter().enumerate() {
+            let mut full = true;
+            for cell in row {
+                if *cell == 0 {
+                    full = false;
+                    break;
+                }
+            }
+            if full {
+                rows_to_remove.push(y);
+            }
+        }
+        for row in rows_to_remove {
+            self.cells.remove(row);
+            self.cells.insert(0, vec![0; self.width as usize]);
+        }
+    }
 
     pub fn tick(&mut self) {
         if self.paused {
             return;
         }
+        self.check_tetris();
         if self.drop_timer >= self.drop_time {
             self.drop_timer = 0;
             self.drop();
