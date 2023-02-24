@@ -15,14 +15,17 @@ pub struct Game {
 }
 
 
-impl Game {
-    pub fn new() -> Game {
+impl Default for Game {
+    fn default() -> Game {
         Game {
             board: Board::new(Box::new(StaticRand), 10, 20),
             score: 0,
             lost: false
         }
     }
+}
+
+impl Game {
 
     pub fn draw(&self) -> Vec<i32> {
         self.board.draw()
@@ -39,6 +42,14 @@ impl Game {
         if self.board.lost {
             self.lost = true;
         }
+    }
+
+    pub fn hard_drop(&mut self) {
+        self.board.hard_drop();
+    }
+
+    pub fn store(&mut self) {
+        self.board.store();
     }
 
     pub fn left(&mut self) {

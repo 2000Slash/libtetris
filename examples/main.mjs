@@ -24,7 +24,13 @@ init().then(() => {
                 break;
             case "q":
                 game.rotate_left();
-            break;
+                break;
+            case "Shift":
+                game.store();
+                break;
+            case " ":
+                game.hard_drop();
+                break;
         }
     }, false);
 
