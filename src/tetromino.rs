@@ -2,7 +2,7 @@ use crate::{shape::Shape, Randomizer};
 
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Tetromino {
     shape: Shape,
     pub pos_x: i32,

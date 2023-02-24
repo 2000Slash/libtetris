@@ -39,6 +39,20 @@ impl Board {
             }
         }
         if let Some(tetromino) = &self.current_tetromino {
+            // A copy of the current tetromino should also be drawn at the bottom of the screen for the hard drop preview
+            let mut preview_tetromino = tetromino.clone();
+
+            while !self.check_collision(&preview_tetromino) {
+                preview_tetromino.move_down();
+            }
+            let collision = preview_tetromino.get_collision();
+            for (y, row) in collision.iter().enumerate() {
+                for (x, cell) in row.iter().enumerate() {
+                    if *cell == 1 {
+                        result[(preview_tetromino.pos_y as usize + y) * self.width as usize + preview_tetromino.pos_x as usize + x] = -1;
+                    }
+                }
+            }
             let collision = tetromino.get_collision();
             for (y, row) in collision.iter().enumerate() {
                 for (x, cell) in row.iter().enumerate() {
@@ -93,8 +107,8 @@ impl Board {
     }
 
     fn drop(&mut self) {
-        if self.current_tetromino.is_some() {
-            if self.check_collision() {
+        if let Some(tetromino) = &self.current_tetromino {
+            if self.check_collision(&tetromino) {
                 self.placement_timer += 1;
                 if self.placement_timer >= 3 {
                     self.placement_timer = 0;
@@ -131,10 +145,12 @@ impl Board {
         if self.paused {
             return;
         }
-        while !self.check_collision() {
-            self.current_tetromino.as_mut().unwrap().move_down();
+        if self.current_tetromino.is_some() {
+            while !self.check_collision(&self.current_tetromino.as_ref().unwrap()) {
+                self.current_tetromino.as_mut().unwrap().move_down();
+            }
+            self.place();
         }
-        self.place();
     }
 
     pub fn store(&mut self) {
@@ -156,18 +172,16 @@ impl Board {
         }
     }
 
-    fn check_collision(&self) -> bool {
-        if let Some(tetromino) = &self.current_tetromino {
-            let collision = tetromino.get_collision();
-            for (y, row) in collision.iter().enumerate() {
-                for (x, cell) in row.iter().enumerate() {
-                    if *cell == 1 {
-                        if tetromino.pos_y as usize + y + 1 >= self.height as usize {
-                            return true;
-                        }
-                        if self.cells[tetromino.pos_y as usize + y + 1][tetromino.pos_x as usize + x] > 0 {
-                            return true;
-                        }
+    fn check_collision(&self, tetromino: &Tetromino) -> bool {
+        let collision = tetromino.get_collision();
+        for (y, row) in collision.iter().enumerate() {
+            for (x, cell) in row.iter().enumerate() {
+                if *cell == 1 {
+                    if tetromino.pos_y as usize + y + 1 >= self.height as usize {
+                        return true;
+                    }
+                    if self.cells[tetromino.pos_y as usize + y + 1][tetromino.pos_x as usize + x] > 0 {
+                        return true;
                     }
                 }
             }
