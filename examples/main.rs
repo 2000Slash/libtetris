@@ -29,10 +29,10 @@ impl Randomizer for Rand {
 }
 
 fn main() {
-    let mut game = Game::default();
+    let mut game = Game::new(Box::new(Rand));
     while !game.lost {
         game.tick();
-        thread::sleep(std::time::Duration::from_millis(10));
+        thread::sleep(std::time::Duration::from_millis(1));
         draw_cells(game.draw());
     }
 }

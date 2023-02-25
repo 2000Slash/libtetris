@@ -15,17 +15,15 @@ pub struct Game {
 }
 
 
-impl Default for Game {
-    fn default() -> Game {
+impl Game {
+
+    pub fn new(random: Box<dyn Randomizer>) -> Game {
         Game {
-            board: Board::new(Box::new(StaticRand), 10, 20),
+            board: Board::new(random, 10, 20),
             score: 0,
             lost: false
         }
     }
-}
-
-impl Game {
 
     pub fn draw(&self) -> Vec<i32> {
         self.board.draw()
