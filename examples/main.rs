@@ -5,17 +5,15 @@ use rand::RngCore;
 
 
 fn draw_cells(cells: Vec<i32>) {
-    let mut i = 0;
-    for cell in cells {
+    for (i, cell) in cells.into_iter().enumerate() {
         if i % 10 == 0 {
-            println!("");
+            println!();
         }
         if cell > 0 {
             print!("█");
         } else {
             print!(" ");
         }
-        i += 1;
     }
     println!();
 }

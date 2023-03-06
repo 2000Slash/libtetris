@@ -25,14 +25,14 @@ pub struct WasmGame {
 
 #[wasm_bindgen]
 impl WasmGame {
-    pub fn new() -> WasmGame {
+    pub fn new() -> Self {
         WasmGame {
             board: Board::new(Box::new(StaticRand), 10, 20),
             score: 0,
             lost: false
         }
     }
-
+    
     pub fn draw(&self) -> Vec<i32> {
         self.board.draw()
     }

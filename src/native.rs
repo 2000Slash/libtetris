@@ -1,81 +1,154 @@
-#![allow(improper_ctypes_definitions)]
-use crate::{board::Board, Randomizer};
 
-extern "C" {
-    pub fn get_random() -> i32;
+use std::collections::HashMap;
+
+use rand::{thread_rng, Rng};
+
+use crate::{game::Game, Randomizer};
+
+#[derive(Default)]
+struct State {
+    games: HashMap<i32, Game>,
+    cells: HashMap<i32, Vec<i32>>
 }
 
-struct ExternRand;
+static mut STATE: Option<State> = None;
 
-impl Randomizer for ExternRand {
+struct Rand;
+
+impl Randomizer for Rand {
     fn next(&mut self) -> usize {
-        unsafe { get_random() as usize }
+        thread_rng().gen()
     }
 }
 
-#[repr(C)]
-pub struct NativeGame {
-    board: Board,
-    pub score: i32,
-    pub lost: bool
+#[no_mangle]
+pub extern "C" fn init() {
+    unsafe {
+        STATE = Some(State::default());
+        println!("Initialized");
+    }
 }
 
-impl NativeGame {
-
-    #[no_mangle]
-    pub extern "C" fn new(width: i32, height: i32) -> NativeGame {
-        NativeGame {
-            board: Board::new(Box::new(ExternRand), width, height),
-            score: 0,
-            lost: false
+#[no_mangle]
+pub extern "C" fn create_game() -> i32 {
+    unsafe {
+        if let Some(state) = &mut STATE {
+            let id = thread_rng().gen();
+            state.games.insert(id, Game::new(Box::new(Rand)));
+            state.cells.insert(id, Vec::new());
+            return id;
         }
     }
+    0
+}
 
-    #[no_mangle]
-    pub extern "C" fn draw(&self) -> *const i32 {
-        self.board.draw().as_ptr()
-    }
-
-    #[no_mangle]
-    pub extern "C" fn tick(&mut self) {
-        self.board.tick();
-        if self.board.lost {
-            self.lost = true;
+#[no_mangle]
+pub extern "C" fn destroy_game(id: i32) {
+    unsafe {
+        if let Some(state) = &mut STATE {
+            state.games.remove(&id);
+            state.cells.remove(&id);
         }
     }
+}
 
-    #[no_mangle]
-    pub extern "C" fn hard_drop(&mut self) {
-        self.board.hard_drop();
+#[no_mangle]
+pub extern "C" fn tick(id: i32) {
+    unsafe {
+        if let Some(state) = &mut STATE {
+            if let Some(game) = state.games.get_mut(&id) {
+                game.tick();
+            }
+        }
     }
+}
 
-    #[no_mangle]
-    pub extern "C" fn store(&mut self) {
-        self.board.store();
+#[no_mangle]
+pub extern "C" fn draw(id: i32) -> *const i32 {
+    unsafe {
+        if let Some(state) = &mut STATE {
+            if let Some(game) = state.games.get_mut(&id) {
+                state.cells.insert(id, game.draw());
+                return state.cells.get(&id).unwrap().as_ptr();
+            }
+        }
     }
+    std::ptr::null()
+}
 
-    #[no_mangle]
-    pub extern "C" fn left(&mut self) {
-        self.board.left();
+#[no_mangle]
+pub extern "C" fn hard_drop(id: i32) {
+    unsafe {
+        if let Some(state) = &mut STATE {
+            if let Some(game) = state.games.get_mut(&id) {
+                game.hard_drop();
+            }
+        }
     }
+}
 
-    #[no_mangle]
-    pub extern "C" fn right(&mut self) {
-        self.board.right();
+#[no_mangle]
+pub extern "C" fn store(id :i32) {
+    unsafe {
+        if let Some(state) = &mut STATE {
+            if let Some(game) = state.games.get_mut(&id) {
+                game.store();
+            }
+        }
     }
+}
 
-    #[no_mangle]
-    pub extern "C" fn down(&mut self) {
-        self.board.down();
+#[no_mangle]
+pub extern "C" fn left(id: i32) {
+    unsafe {
+        if let Some(state) = &mut STATE {
+            if let Some(game) = state.games.get_mut(&id) {
+                game.left();
+            }
+        }
     }
+}
 
-    #[no_mangle]
-    pub extern "C" fn rotate_right(&mut self) {
-        self.board.rotate_right();
+#[no_mangle]
+pub extern "C" fn right(id: i32) {
+    unsafe {
+        if let Some(state) = &mut STATE {
+            if let Some(game) = state.games.get_mut(&id) {
+                game.right();
+            }
+        }
     }
+}
 
-    #[no_mangle]
-    pub extern "C" fn rotate_left(&mut self) {
-        self.board.rotate_left();
+#[no_mangle]
+pub extern "C" fn down(id: i32) {
+    unsafe {
+        if let Some(state) = &mut STATE {
+            if let Some(game) = state.games.get_mut(&id) {
+                game.down();
+            }
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rotate_right(id: i32) {
+    unsafe {
+        if let Some(state) = &mut STATE {
+            if let Some(game) = state.games.get_mut(&id) {
+                game.rotate_right();
+            }
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn rotate_left(id: i32) {
+    unsafe {
+        if let Some(state) = &mut STATE {
+            if let Some(game) = state.games.get_mut(&id) {
+                game.rotate_left();
+            }
+        }
     }
 }

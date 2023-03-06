@@ -17,15 +17,15 @@ pub struct Board {
 impl Board {
     pub fn new(random: Box<dyn Randomizer>, width: i32, height: i32) -> Board {
         Board {
-            width: width,
-            height: height,
+            width,
+            height,
             cells: vec![vec![0; width as usize]; height as usize],
             current_tetromino: None,
             stored_tetromino: None,
             placement_timer: 0,
             drop_timer: 0,
-            drop_time: 50,
-            random: random,
+            drop_time: 10,
+            random,
             paused: false,
             lost: false
         }
@@ -49,7 +49,7 @@ impl Board {
             for (y, row) in collision.iter().enumerate() {
                 for (x, cell) in row.iter().enumerate() {
                     if *cell == 1 {
-                        result[(preview_tetromino.pos_y as usize + y) * self.width as usize + preview_tetromino.pos_x as usize + x] = -1;
+                        result[((preview_tetromino.pos_y + y as i32) * self.width + preview_tetromino.pos_x + x as i32) as usize] = -1;
                     }
                 }
             }
@@ -57,7 +57,7 @@ impl Board {
             for (y, row) in collision.iter().enumerate() {
                 for (x, cell) in row.iter().enumerate() {
                     if *cell == 1 {
-                        result[(tetromino.pos_y as usize + y) * self.width as usize + tetromino.pos_x as usize + x] = tetromino.get_color();
+                        result[((tetromino.pos_y + y as i32) * self.width + tetromino.pos_x + x as i32) as usize] = tetromino.get_color();
                     }
                 }
             }
@@ -108,7 +108,7 @@ impl Board {
 
     fn drop(&mut self) {
         if let Some(tetromino) = &self.current_tetromino {
-            if self.check_collision(&tetromino) {
+            if self.check_collision(tetromino) {
                 self.placement_timer += 1;
                 if self.placement_timer >= 3 {
                     self.placement_timer = 0;
@@ -129,11 +129,11 @@ impl Board {
             for (y, row) in collision.iter().enumerate() {
                 for (x, cell) in row.iter().enumerate() {
                     if *cell == 1 {
-                        if tetromino.pos_y as usize + y == 0 {
+                        if tetromino.pos_y + y as i32 == 0 {
                             self.lost = true;
                             return;
                         }
-                        self.cells[tetromino.pos_y as usize + y][tetromino.pos_x as usize + x] = tetromino.get_color();
+                        self.cells[(tetromino.pos_y + y as i32) as usize][(tetromino.pos_x + x as i32) as usize] = tetromino.get_color();
                     }
                 }
             }
@@ -146,7 +146,7 @@ impl Board {
             return;
         }
         if self.current_tetromino.is_some() {
-            while !self.check_collision(&self.current_tetromino.as_ref().unwrap()) {
+            while !self.check_collision(self.current_tetromino.as_ref().unwrap()) {
                 self.current_tetromino.as_mut().unwrap().move_down();
             }
             self.place();
@@ -177,10 +177,10 @@ impl Board {
         for (y, row) in collision.iter().enumerate() {
             for (x, cell) in row.iter().enumerate() {
                 if *cell == 1 {
-                    if tetromino.pos_y as usize + y + 1 >= self.height as usize {
+                    if tetromino.pos_y + y as i32 + 1 >= self.height {
                         return true;
                     }
-                    if self.cells[tetromino.pos_y as usize + y + 1][tetromino.pos_x as usize + x] > 0 {
+                    if self.cells[(tetromino.pos_y + y as i32 + 1) as usize][(tetromino.pos_x + x as i32) as usize] > 0 {
                         return true;
                     }
                 }
@@ -198,10 +198,10 @@ impl Board {
             for (y, row) in collision.iter().enumerate() {
                 for (x, cell) in row.iter().enumerate() {
                     if *cell == 1 {
-                        if tetromino.pos_x as usize + x == 0 {
+                        if tetromino.pos_x + x as i32 == 0 {
                             return;
                         }
-                        if self.cells[tetromino.pos_y as usize + y][tetromino.pos_x as usize + x - 1] > 0 {
+                        if self.cells[(tetromino.pos_y + y as i32) as usize][(tetromino.pos_x + x as i32 - 1) as usize] > 0 {
                             return;
                         }
                     }
@@ -220,10 +220,10 @@ impl Board {
             for (y, row) in collision.iter().enumerate() {
                 for (x, cell) in row.iter().enumerate() {
                     if *cell == 1 {
-                        if tetromino.pos_x as usize + x + 1 >= self.width as usize {
+                        if tetromino.pos_x + x as i32 + 1 >= self.width {
                             return;
                         }
-                        if self.cells[tetromino.pos_y as usize + y][tetromino.pos_x as usize + x + 1] > 0 {
+                        if self.cells[(tetromino.pos_y + y as i32) as usize][(tetromino.pos_x + x as i32 + 1) as usize] > 0 {
                             return;
                         }
                     }
@@ -242,11 +242,11 @@ impl Board {
             for (y, row) in collision.iter().enumerate() {
                 for (x, cell) in row.iter().enumerate() {
                     if *cell == 1 {
-                        if tetromino.pos_y as usize + y + 1 >= self.height as usize {
+                        if tetromino.pos_y + y as i32 + 1 >= self.height {
                             self.placement_timer = 10;
                             return;
                         }
-                        if self.cells[tetromino.pos_y as usize + y + 1][tetromino.pos_x as usize + x] > 0 {
+                        if self.cells[(tetromino.pos_y + y as i32 + 1) as usize][(tetromino.pos_x + x as i32) as usize] > 0 {
                             return;
                         }
                     }
@@ -266,15 +266,19 @@ impl Board {
             for (y, row) in collision.iter().enumerate() {
                 for (x, cell) in row.iter().enumerate() {
                     if *cell == 1 {
-                        if tetromino.pos_x as usize + x >= self.width as usize {
+                        if tetromino.pos_x + x as i32 >= self.width {
                             tetromino.move_left();
                             return;
                         }
-                        if tetromino.pos_y as usize + y >= self.height as usize {
+                        if (tetromino.pos_x + x as i32) < 0 {
+                            tetromino.move_right();
+                            return;
+                        }
+                        if tetromino.pos_y + y as i32 >= self.height {
                             tetromino.move_up();
                             return;
                         }
-                        if self.cells[tetromino.pos_y as usize + y][tetromino.pos_x as usize + x] > 0 {
+                        if self.cells[(tetromino.pos_y + y as i32) as usize][(tetromino.pos_x + x as i32) as usize] > 0 {
                             tetromino.rotate(-1);
                             return;
                         }
@@ -294,15 +298,19 @@ impl Board {
             for (y, row) in collision.iter().enumerate() {
                 for (x, cell) in row.iter().enumerate() {
                     if *cell == 1 {
-                        if tetromino.pos_x as usize + x >= self.width as usize {
+                        if tetromino.pos_x + x as i32 >= self.width {
                             tetromino.move_left();
                             return;
                         }
-                        if tetromino.pos_y as usize + y >= self.height as usize {
+                        if (tetromino.pos_x + x as i32) < 0 {
+                            tetromino.move_right();
+                            return;
+                        }
+                        if tetromino.pos_y + y as i32 >= self.height {
                             tetromino.move_up();
                             return;
                         }
-                        if self.cells[tetromino.pos_y as usize + y][tetromino.pos_x as usize + x] > 0 {
+                        if self.cells[(tetromino.pos_y + y as i32) as usize][(tetromino.pos_x + x as i32) as usize] > 0 {
                             tetromino.rotate(1);
                             return;
                         }

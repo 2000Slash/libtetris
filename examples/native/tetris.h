@@ -6,18 +6,16 @@
 #define WIDTH 10
 #define HEIGHT 20
 
-typedef struct Game {
-  char data[112];
-} Game;
+void init();
 
-Game new(int width, int height);
-
-int* draw(Game* game);
-void tick(Game* game);
-void hard_drop(Game* game);
-void store(Game* game);
-void left(Game* game);
-void right(Game* game);
-void down(Game* game);
-void rotate_right(Game* game);
-void rotate_left(Game* game);
+int create_game();
+void tick(int id);
+int* draw(int id);
+void hard_drop(int id);
+void store(int id);
+void left(int id);
+void right(int id);
+void down(int id);
+void rotate_right(int id);
+void rotate_left(int id);
+void destroy_game(int id);

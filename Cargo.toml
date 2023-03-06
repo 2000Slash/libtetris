@@ -1,6 +1,6 @@
 [package]
 name = "libtetris"
-version = "0.0.5"
+version = "0.0.6"
 edition = "2021"
 license = "MIT"
 description = "A basic tetris implementation"
@@ -19,7 +19,8 @@ rand = "0.8.5"
 [dependencies]
 wasm-bindgen = { version = "0.2.84", optional = true}
 console_error_panic_hook = { version = "0.1.7", optional = true}
+rand = {version = "0.8.5", optional = true}
 
 [features]
 wasm = ["dep:wasm-bindgen", "dep:console_error_panic_hook"]
-native = []
+native = ["dep:rand"]

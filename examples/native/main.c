@@ -6,11 +6,11 @@
 #include <unistd.h>
 
 void main() {
-    srand(time(NULL));
-    Game game = new(WIDTH, HEIGHT);
-    printf("Created game in: %p", &game);
+    init();
+    int game = create_game();
+    printf("Created game id: %d", game);
     while (1==1) {
-        int* vec = draw(&game);
+        int* vec = draw(game);
         int counter = 0;
         for (int i = 0; i < HEIGHT*WIDTH; i++) {
             if (counter % 10 == 0) {
@@ -24,11 +24,8 @@ void main() {
             counter++;
         }
         printf("\n---------------------\n");
-        tick(&game);
+        tick(game);
         usleep(1000);
     }
-}
-
-int extern get_random() {
-    return rand() % 7;
+    destroy_game(game);
 }
